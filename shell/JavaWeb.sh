@@ -7,7 +7,7 @@ _DEBUG=on;
 # Tomcat安装路径
 tomcat_path=/usr/tomcat;
 # Tomcat下载路径
-tomcat_url=http://mirrors.hust.edu.cn/apache/tomcat/tomcat-9/v9.0.7/bin/apache-tomcat-9.0.7.tar.gz;
+tomcat_url=http://mirrors.advancedhosters.com/apache/tomcat/tomcat-9/v9.0.10/bin/apache-tomcat-9.0.10.tar.gz;
 # MySQL root用户密码
 root_password=root;
 # MySQL RPM下载地址
