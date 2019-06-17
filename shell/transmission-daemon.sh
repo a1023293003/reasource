@@ -159,6 +159,3 @@ modifyFirewall;
 
 systemctl start transmission-daemon;
 systemctl status transmission-daemon;
-
-
-
