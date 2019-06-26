@@ -9,25 +9,29 @@ config_file="$config_path/settings.json";
 # 配置定义
 declare -A config
 config["peer-port"]=51432;
-config["rpc-port"]=9527;
-config["rpc-enabled"]=true;
-config["rpc-whitelist-enabled"]=false;
 config["rpc-authentication-required"]=true;
+config["rpc-enabled"]=true;
+config["rpc-port"]=80;
+config["rpc-url"]="/";
+config["rpc-whitelist-enabled"]=false;
 
 # 变量定义
 rpc_username="";
 rpc_password="";
 download_dir="/td/downloads";
+incomplete_dir="/td/tmp";
 
 # 变量名和变量输入提示信息数组。
 var_name_array=(
     "rpc_username" 
     "rpc_password" 
-    "download_dir");
+    "download_dir" 
+    "incomplete_dir");
 var_msg_array=(
     "请输入管理员账号(必填)" 
     "请输入管理员密码(必填)" 
-    "请输入文件下载目录(默认为[/td/downloads])");
+    "请输入文件下载目录(默认为[/td/downloads])" 
+    "请输入文件下载暂存目录(默认为[/td/tmp])");
 
 # ============================================
 # 参数录入
@@ -68,6 +72,8 @@ function init() {
     rm -rf $td_config_file;
     td_download_dir=$2;
     mkdir -p $td_download_dir;
+    td_incomplete_dir=$3;
+    mkdir -p $td_incomplete_dir;
 }
 
 # ============================================
@@ -106,6 +112,7 @@ function modifyConfig() {
     modifyConfigField "rpc-username" $rpc_username $config_file;
     modifyConfigField "rpc-password" $rpc_password $config_file;
     modifyConfigField "download-dir" $download_dir $config_file;
+    modifyConfigField "download-dir" $download_dir $config_file;
 }
 
 # ============================================
@@ -122,9 +129,16 @@ function modifyService() {
 # 修改文件/文件夹操作权限
 # ============================================
 function chmodFiles() {
-    chmod 777 $1;
-    chmod 777 $1/*;
-    chmod 777 $2;
+    files=$1;
+    for file ${files[*]}; do
+        echo $file;
+        chmod 777 $file;
+        if [ -d $file ]; then
+            chmod 777 $file/*;
+        else
+        
+        fi
+    done
 }
 
 # ============================================
@@ -145,8 +159,9 @@ input "${var_name_array[*]}" "${var_msg_array[*]}";
 echo "管理员账号   : [$rpc_username]";
 echo "管理员密码   : [$rpc_password]";
 echo "文件下载目录 : [$download_dir]";
+echo "文件下载暂存目录 : [$incomplete_dir]";
 
-init $config_file $download_dir;
+init $config_file $download_dir $incomplete_dir;
 
 yum install -y transmission transmission-daemon;
 transmission-daemon -g $config_path;
@@ -154,7 +169,7 @@ killall transmission-daemon;
 
 modifyConfig;
 modifyService $config_path;
-chmodFiles $config_path $download_dir;
+chmodFiles $config_path $download_dir $incomplete_dir;
 modifyFirewall;
 
 systemctl start transmission-daemon;
