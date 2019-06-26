@@ -68,12 +68,28 @@ function input() {
 function init() {
     yum install -y wget;
     yum remove -y transmission transmission-daemon;
-    td_config_file=$1;
-    rm -rf $td_config_file;
-    td_download_dir=$2;
-    mkdir -p $td_download_dir;
-    td_incomplete_dir=$3;
-    mkdir -p $td_incomplete_dir;
+}
+
+# ============================================
+# 删除文件
+# ============================================
+function removeFiles() {
+    files=$@;
+    for file in ${files[@]}; do
+        echo "删除文件$file";
+        rm -rf $file;
+    done
+}
+
+# ============================================
+# 创建文件夹
+# ============================================
+function mkdirs() {
+    files=$@;
+    for file in ${files[@]}; do
+        echo "创建文件夹$file";
+        mkdir -p $file;
+    done
 }
 
 # ============================================
@@ -112,7 +128,7 @@ function modifyConfig() {
     modifyConfigField "rpc-username" $rpc_username $config_file;
     modifyConfigField "rpc-password" $rpc_password $config_file;
     modifyConfigField "download-dir" $download_dir $config_file;
-    modifyConfigField "download-dir" $download_dir $config_file;
+    modifyConfigField "incomplete-dir" $incomplete_dir $config_file;
 }
 
 # ============================================
@@ -129,14 +145,12 @@ function modifyService() {
 # 修改文件/文件夹操作权限
 # ============================================
 function chmodFiles() {
-    files=$1;
-    for file ${files[*]}; do
+    files=$@;
+    for file in ${files[@]}; do
         echo $file;
         chmod 777 $file;
         if [ -d $file ]; then
             chmod 777 $file/*;
-        else
-        
         fi
     done
 }
@@ -161,7 +175,9 @@ echo "管理员密码   : [$rpc_password]";
 echo "文件下载目录 : [$download_dir]";
 echo "文件下载暂存目录 : [$incomplete_dir]";
 
-init $config_file $download_dir $incomplete_dir;
+init;
+removeFiles $config_file;
+mkdirs $download_dir $incomplete_dir;
 
 yum install -y transmission transmission-daemon;
 transmission-daemon -g $config_path;
