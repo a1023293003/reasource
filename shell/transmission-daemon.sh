@@ -11,8 +11,8 @@ declare -A config
 config["peer-port"]=51432;
 config["rpc-authentication-required"]=true;
 config["rpc-enabled"]=true;
-config["rpc-port"]=80;
-config["rpc-url"]="/";
+config["rpc-port"]=9527;
+config["rpc-url"]="/td";
 config["rpc-whitelist-enabled"]=false;
 
 # 变量定义
